@@ -42,6 +42,18 @@ Pizza.prototype.getPrice = function(){
   return total;
 }
 
+Pizza.prototype.changeSize = function(size){
+  if(Pizza.prototype.sizes[size] !== undefined){
+    this.size = Pizza.prototype.sizes[size];
+  } else {
+    this.size = Pizza.prototype.sizes.m;
+  }
+}
+
+Pizza.prototype.hasTopping = function(topping){
+  return this.toppings.indexOf(topping) !== -1;
+}
+
 Pizza.prototype.addTopping = function(topping){
   if(this.toppings.indexOf(topping) === -1){
     this.toppings.push(topping);
@@ -49,9 +61,8 @@ Pizza.prototype.addTopping = function(topping){
 }
 
 Pizza.prototype.removeTopping = function(topping){
-  var toppingIndex = this.toppings.indexOf(topping)
-  if(toppingIndex !== -1){
-    this.toppings.splice(toppingIndex, 1);
+  if(this.hasTopping(topping)){
+    this.toppings.splice(this.toppings.indexOf(topping), 1);
   }
 }
 
@@ -59,46 +70,33 @@ Pizza.prototype.removeTopping = function(topping){
 
 var pizzas = [];
 var activePizza;
-var pizzaSize;
 
-var addToPizza = function (){
+var moveToPizza = function (){
   var topping = getToppingByID(parseInt($(this).attr("name")));
   activePizza.addTopping(topping);
-  updateTotalPrice();
 
   $(this).remove();
   $("#pizza-toppings-display").append(this);
-  $(this).click(removeFromPizza);
+  $(this).click(moveToTray);
+  updatePrices();
 }
 
-var removeFromPizza = function (){
+var moveToTray = function (){
   var topping = getToppingByID(parseInt($(this).attr("name")));
   activePizza.removeTopping(topping);
-  updateTotalPrice();
+  updatePrices();
 
   $(this).remove();
   $("#toppings-list .row:first-child").append(this);
-  $(this).click(addToPizza);
-}
-
-function updatePizzaSize(value){
-  if(Pizza.prototype.sizes[value] !== undefined){
-    pizzaSize = Pizza.prototype.sizes[value];
-  } else {
-    pizzaSize = Pizza.prototype.sizes["m"];
-  }
-  activePizza.size = pizzaSize;
-}
-
-function updateTotalPrice(){
-  $("#pizza-price").text(activePizza.getPrice().toFixed(2));
+  $(this).click(moveToPizza);
 }
 
 function updatePrices(){
   $(".topping").each(function(){
     var topping = getToppingByID(parseInt($(this).attr("name")));
-    $(this).find(".price").text(topping.getPrice(pizzaSize).toFixed(2));
+    $(this).find(".price").text(topping.getPrice(activePizza.size).toFixed(2));
   });
+  $("#pizza-price").text(activePizza.getPrice().toFixed(2));
 }
 
 function resetPizza(){
@@ -106,31 +104,47 @@ function resetPizza(){
     var toppingHTML = $(`#topping-${topping.id}`);
     toppingHTML.remove();
     $("#toppings-list .row:first-child").append(toppingHTML);
-    toppingHTML.click(addToPizza);
+    toppingHTML.click(moveToPizza);
   });
   activePizza.toppings = [];
-  updateTotalPrice();
+  updatePrices();
 }
 
-function writeTopping(topping){
-  var toppingString =
-  `<div class="col-lg-4 col-md-6 col-sm-12 topping" name="${topping.id}"id="topping-${topping.id}">
-    <button type="button" class="btn btn-primary">${topping.name} - <span class="price">${topping.price * pizzaSize}</span></button>
-  </div>`;
-  $("#toppings-list .row:first-child").append(toppingString);
-  $(`#topping-${topping.id}`).click(addToPizza);
+function setActivePizza(pizza){
+  if(pizzas.indexOf(pizza) === -1){
+    pizzas.push(pizza);
+  }
+  activePizza = pizza;
+  writeToppings();
+}
+
+function writeToppings(){
+  $("#pizza-toppings-display").text("");
+  $("#toppings-list .row:first-child").text("");
+  toppings.forEach(function(topping){
+    var toppingString =
+    `<div class="col-lg-4 col-md-6 col-sm-12 topping" name="${topping.id}"id="topping-${topping.id}">
+      <button type="button" class="btn btn-primary">${topping.name} - <span class="price">${topping.price * activePizza.size}</span></button>
+    </div>`;
+    if(activePizza.hasTopping(topping)){
+      $("#pizza-toppings-display").append(toppingString);
+      $(`#topping-${topping.id}`).click(moveToTray);
+    } else {
+      $("#toppings-list .row:first-child").append(toppingString);
+      $(`#topping-${topping.id}`).click(moveToPizza);
+    }
+  });
+  updatePrices();
 }
 
 $(document).ready(function(){
   activePizza = new Pizza(Pizza.prototype.sizes.m)
-  updateTotalPrice();
+  updatePrices();
   pizzas.push(activePizza);
-  updatePizzaSize($("#size-selection select").val());
 
   $("#size-selection select").change(function(){
-    updatePizzaSize($(this).val());
+    activePizza.changeSize($(this).val());
     updatePrices();
-    updateTotalPrice();
   });
 
   $("#reset-button").click(resetPizza);
@@ -140,7 +154,5 @@ $(document).ready(function(){
     resetPizza();
   });
 
-  toppings.forEach(function(topping){
-    writeTopping(topping);
-  });
+  writeToppings();
 });
