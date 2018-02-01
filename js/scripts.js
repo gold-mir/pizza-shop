@@ -11,7 +11,7 @@ Topping.prototype.getPrice = function(size){
 }
 
 var toppings = [new Topping("Fancy Cheese", 1.1), new Topping("Bacon", 4), new Topping("Pineapple", 1.5), new Topping("Feta", 1.3), new Topping("Chicken", 2.2)
-, new Topping("Pepperoni", 2.5), new Topping("Olives", .9), new Topping("Spinach", 0.5), new Topping("Tomatoes", .4)];
+, new Topping("Pepperoni", 2.5), new Topping("Olives", .9), new Topping("Spinach", 0.5), new Topping("Tomatoes", .4), new Topping("Cat Hair", -4), new Topping("Ground Beef", 2.8), new Topping("Onions", 1.1)];
 
 function getToppingByID(id){
   for(let i = 0; i < toppings.length; i++){
@@ -101,6 +101,17 @@ function updatePrices(){
   });
 }
 
+function resetPizza(){
+  activePizza.toppings.forEach(function(topping){
+    var toppingHTML = $(`#topping-${topping.id}`);
+    toppingHTML.remove();
+    $("#toppings-list .row:first-child").append(toppingHTML);
+    toppingHTML.click(addToPizza);
+  });
+  activePizza.toppings = [];
+  updateTotalPrice();
+}
+
 $(document).ready(function(){
   activePizza = new Pizza(Pizza.prototype.sizes.m)
   updateTotalPrice();
@@ -111,6 +122,13 @@ $(document).ready(function(){
     updatePizzaSize($(this).val());
     updatePrices();
     updateTotalPrice();
+  });
+
+  $("#reset-button").click(resetPizza);
+
+  $("#order-button").click(function(){
+    alert(`The total cost of your Pizza will be $${activePizza.getPrice()}.`);
+    resetPizza();
   });
 
   toppings.forEach(function(topping){

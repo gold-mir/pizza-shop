@@ -16,7 +16,6 @@
       </div>
       <div class="row">
         <div class="col-md-2">
-          <!-- sidebar and list of currently ordered pizzas -->
         </div>
         <div class="col-md-10">
           <div class="row">
@@ -39,12 +38,16 @@
               </div>
             </div>
             <div class="col-md-4" id="pizza-display">
-              <div class="card-header">
-                <h4>This Pizza: <span class="price" id="pizza-price"></span></h4>
-              </div>
               <div class="card">
+                <div class="card-header">
+                  <h4>This Pizza: <span class="price" id="pizza-price"></span></h4>
+                </div>
                 <div class="card-body" id="pizza-toppings-display">
 
+                </div>
+                <div class="card-footer">
+                  <button id="order-button"type="button" name="button" class="btn btn-primary">Order</button>
+                  <button id="reset-button"type="button" name="button" class="btn btn-primary">Reset</button>
                 </div>
               </div>
             </div>
