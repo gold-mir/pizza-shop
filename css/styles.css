@@ -1,3 +1,7 @@
 .price:before {
   content: "$";
 }
+
+.topping {
+  padding-bottom: 0.3em;
+}

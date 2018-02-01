@@ -10,7 +10,8 @@ Topping.prototype.getPrice = function(size){
   return this.price * size;
 }
 
-var toppings = [new Topping("Cheese", 1), new Topping("Bacon", 3), new Topping("Pineapple", 1.5)];
+var toppings = [new Topping("Fancy Cheese", 1.1), new Topping("Bacon", 4), new Topping("Pineapple", 1.5), new Topping("Feta", 1.3), new Topping("Chicken", 2.2)
+, new Topping("Pepperoni", 2.5), new Topping("Olives", .9), new Topping("Spinach", 0.5), new Topping("Tomatoes", .4)];
 
 function getToppingByID(id){
   for(let i = 0; i < toppings.length; i++){
