@@ -33,55 +33,90 @@ Pizza.prototype.basePrice = 15;
 Pizza.prototype.sizes = {xs: 0.6, s: 0.75, m: 1, lg: 1.4, xl: 1.8};
 
 Pizza.prototype.getPrice = function(){
-  var total = basePrice * this.size;
+  var size = this.size;
+  var total = this.basePrice * size;
   this.toppings.forEach(function(topping){
-    total += topping.getPrice(this.size);
+    total += topping.getPrice(size);
   });
   return total;
 }
 
+Pizza.prototype.addTopping = function(topping){
+  if(this.toppings.indexOf(topping) === -1){
+    this.toppings.push(topping);
+  }
+}
+
+Pizza.prototype.removeTopping = function(topping){
+  var toppingIndex = this.toppings.indexOf(topping)
+  if(toppingIndex !== -1){
+    this.toppings.splice(toppingIndex, 1);
+  }
+}
+
+//frontend
+
+var pizzas = [];
+var activePizza;
+var pizzaSize;
+
 var addToPizza = function (){
+  var topping = getToppingByID(parseInt($(this).attr("name")));
+  activePizza.addTopping(topping);
+  updateTotalPrice();
+
   $(this).remove();
-  $("#pizza-display").append(this);
+  $("#pizza-toppings-display").append(this);
   $(this).click(removeFromPizza);
 }
 
 var removeFromPizza = function (){
+  var topping = getToppingByID(parseInt($(this).attr("name")));
+  activePizza.removeTopping(topping);
+  updateTotalPrice();
+
   $(this).remove();
   $("#toppings-list .row:first-child").append(this);
   $(this).click(addToPizza);
 }
 
-var pizzaSize;
-
 function updatePizzaSize(value){
   if(Pizza.prototype.sizes[value] !== undefined){
-    pizzaSize = value;
+    pizzaSize = Pizza.prototype.sizes[value];
   } else {
-    pizzaSize = "m";
+    pizzaSize = Pizza.prototype.sizes["m"];
   }
+  activePizza.size = pizzaSize;
+}
+
+function updateTotalPrice(){
+  $("#pizza-price").text(activePizza.getPrice().toFixed(2));
 }
 
 function updatePrices(){
   $(".topping").each(function(){
     var topping = getToppingByID(parseInt($(this).attr("name")));
-    $(this).find(".price").text(topping.getPrice(Pizza.prototype.sizes[pizzaSize]).toFixed(2));
+    $(this).find(".price").text(topping.getPrice(pizzaSize).toFixed(2));
   });
 }
 
 $(document).ready(function(){
+  activePizza = new Pizza(Pizza.prototype.sizes.m)
+  updateTotalPrice();
+  pizzas.push(activePizza);
   updatePizzaSize($("#size-selection select").val());
 
   $("#size-selection select").change(function(){
     updatePizzaSize($(this).val());
     updatePrices();
+    updateTotalPrice();
   });
 
   toppings.forEach(function(topping){
 
     var toppingString =
     `<div class="col-lg-4 col-md-6 col-sm-12 topping" name="${topping.id}"id="topping-${topping.id}">
-      <button type="button" class="btn btn-secondary">${topping.name} - <span class="price">${topping.price * Pizza.prototype.sizes[pizzaSize]}</span></button>
+      <button type="button" class="btn btn-primary">${topping.name} - <span class="price">${topping.price * pizzaSize}</span></button>
     </div>`;
     $("#toppings-list .row:first-child").append(toppingString);
     $(`#topping-${topping.id}`).click(addToPizza);
