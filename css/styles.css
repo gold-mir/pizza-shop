@@ -9,3 +9,11 @@
 .topbar {
   text-align: center;
 }
+
+#pizzas-list {
+  text-align: center;
+}
+
+#pizza-display .card-footer {
+  text-align: center;
+}

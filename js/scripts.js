@@ -112,6 +112,15 @@ function resetPizza(){
   updateTotalPrice();
 }
 
+function writeTopping(topping){
+  var toppingString =
+  `<div class="col-lg-4 col-md-6 col-sm-12 topping" name="${topping.id}"id="topping-${topping.id}">
+    <button type="button" class="btn btn-primary">${topping.name} - <span class="price">${topping.price * pizzaSize}</span></button>
+  </div>`;
+  $("#toppings-list .row:first-child").append(toppingString);
+  $(`#topping-${topping.id}`).click(addToPizza);
+}
+
 $(document).ready(function(){
   activePizza = new Pizza(Pizza.prototype.sizes.m)
   updateTotalPrice();
@@ -132,12 +141,6 @@ $(document).ready(function(){
   });
 
   toppings.forEach(function(topping){
-
-    var toppingString =
-    `<div class="col-lg-4 col-md-6 col-sm-12 topping" name="${topping.id}"id="topping-${topping.id}">
-      <button type="button" class="btn btn-primary">${topping.name} - <span class="price">${topping.price * pizzaSize}</span></button>
-    </div>`;
-    $("#toppings-list .row:first-child").append(toppingString);
-    $(`#topping-${topping.id}`).click(addToPizza);
+    writeTopping(topping);
   });
 });

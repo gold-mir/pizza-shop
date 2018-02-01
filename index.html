@@ -10,12 +10,22 @@
     <title>Pizza!</title>
   </head>
   <body>
-    <div class="container">
+    <div class="container-fluid">
       <div class="topbar">
         <h1>Cool Pizza Shop!</h1>
       </div>
       <div class="row">
         <div class="col-md-2">
+          <div class="card">
+            <div class="card-header">
+              <h4>Your Pizzas</h4>
+            </div>
+            <div class="card-body" id="pizzas-list">
+              <div class="pizzaSelection" id="pizza-{id}">
+                <button type="button" class="btn btn-primary">Pizza Name</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="col-md-10">
           <div class="row">
