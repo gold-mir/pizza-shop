@@ -33,6 +33,20 @@ Pizza.prototype.id = 0;
 Pizza.prototype.basePrice = 15;
 Pizza.prototype.sizes = {xs: 0.6, s: 0.75, m: 1, lg: 1.4, xl: 1.8};
 
+Pizza.prototype.getSizeName = function(){
+  if (this.size === 0.6){
+    return "xs";
+  } else if (this.size === 0.75){
+    return "s";
+  } else if (this.size === 1.4){
+    return "lg";
+  } else if (this.size === 1.8){
+    return "xl";
+  } else {
+    return "m";
+  }
+}
+
 Pizza.prototype.getPrice = function(){
   var size = this.size;
   var total = this.basePrice * size;
@@ -66,10 +80,16 @@ Pizza.prototype.removeTopping = function(topping){
   }
 }
 
-//frontend
-
 var pizzas = [];
 var activePizza;
+
+function getPizzaByID(id){
+  for(var i = 0; i < pizzas.length; i++){
+    if(pizzas[i].id === id){
+      return pizzas[i];
+    }
+  }
+}
 
 var moveToPizza = function (){
   var topping = getToppingByID(parseInt($(this).attr("name")));
@@ -108,6 +128,7 @@ function resetPizza(){
   });
   activePizza.toppings = [];
   updatePrices();
+  $("#size-selection select option[value=m]").prop({selected: true});
 }
 
 function setActivePizza(pizza){
@@ -116,6 +137,7 @@ function setActivePizza(pizza){
   }
   activePizza = pizza;
   writeToppings();
+  $(`#size-selection select option[value=${pizza.getSizeName()}]`).prop({selected: true});
 }
 
 function writeToppings(){
@@ -138,9 +160,7 @@ function writeToppings(){
 }
 
 $(document).ready(function(){
-  activePizza = new Pizza(Pizza.prototype.sizes.m)
-  updatePrices();
-  pizzas.push(activePizza);
+  setActivePizza(new Pizza(Pizza.prototype.sizes.m));
 
   $("#size-selection select").change(function(){
     activePizza.changeSize($(this).val());
@@ -149,9 +169,20 @@ $(document).ready(function(){
 
   $("#reset-button").click(resetPizza);
 
-  $("#order-button").click(function(){
-    alert(`The total cost of your Pizza will be $${activePizza.getPrice()}.`);
-    resetPizza();
+  $("#save-button").click(function(){
+    if($(`#pizza-${activePizza.id}`).length === 0){
+      var pizzaName = prompt("Please name your pizza:");
+      var pizzaString =
+      `<div class="pizza-selection" name="${activePizza.id}"id="pizza-${activePizza.id}">
+        <button type="button" class="btn btn-primary">${pizzaName}</button>
+      </div>`
+      $("#pizzas-list").append(pizzaString);
+      $(`#pizza-${activePizza.id}`).click(function(){
+        var pizza = getPizzaByID(parseInt($(this).attr("name")));
+        setActivePizza(pizza);
+      });
+      setActivePizza(new Pizza(Pizza.prototype.sizes.m));
+    }
   });
 
   writeToppings();
