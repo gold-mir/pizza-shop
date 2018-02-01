@@ -92,23 +92,25 @@ function getPizzaByID(id){
 }
 
 var moveToPizza = function (){
-  var topping = getToppingByID(parseInt($(this).attr("name")));
+  var toppingJQ = $(this).parent();
+  var topping = getToppingByID(parseInt(toppingJQ.attr("name")));
   activePizza.addTopping(topping);
 
-  $(this).remove();
-  $("#pizza-toppings-display").append(this);
-  $(this).click(moveToTray);
+  toppingJQ.remove();
+  $("#pizza-toppings-display").append(toppingJQ);
+  toppingJQ.find("button").click(moveToTray);
   updatePrices();
 }
 
 var moveToTray = function (){
-  var topping = getToppingByID(parseInt($(this).attr("name")));
+  var toppingJQ = $(this).parent();
+  var topping = getToppingByID(parseInt(toppingJQ.attr("name")));
   activePizza.removeTopping(topping);
   updatePrices();
 
-  $(this).remove();
-  $("#toppings-list .row:first-child").append(this);
-  $(this).click(moveToPizza);
+  toppingJQ.remove();
+  $("#toppings-list .row:first-child").append(toppingJQ);
+  toppingJQ.find("button").click(moveToPizza);
 }
 
 function updatePrices(){
@@ -124,7 +126,7 @@ function resetPizza(){
     var toppingHTML = $(`#topping-${topping.id}`);
     toppingHTML.remove();
     $("#toppings-list .row:first-child").append(toppingHTML);
-    toppingHTML.click(moveToPizza);
+    toppingHTML.find("button").click(moveToPizza);
   });
   activePizza.toppings = [];
   updatePrices();
@@ -150,10 +152,10 @@ function writeToppings(){
     </div>`;
     if(activePizza.hasTopping(topping)){
       $("#pizza-toppings-display").append(toppingString);
-      $(`#topping-${topping.id}`).click(moveToTray);
+      $(`#topping-${topping.id} button`).click(moveToTray);
     } else {
       $("#toppings-list .row:first-child").append(toppingString);
-      $(`#topping-${topping.id}`).click(moveToPizza);
+      $(`#topping-${topping.id} button`).click(moveToPizza);
     }
   });
   updatePrices();
@@ -171,18 +173,18 @@ $(document).ready(function(){
 
   $("#save-button").click(function(){
     if($(`#pizza-${activePizza.id}`).length === 0){
-      var pizzaName = prompt("Please name your pizza:");
+      var pizzaName = prompt("Please name your pizza to save it:");
       var pizzaString =
       `<div class="pizza-selection" name="${activePizza.id}"id="pizza-${activePizza.id}">
         <button type="button" class="btn btn-primary">${pizzaName}</button>
       </div>`
       $("#pizzas-list").append(pizzaString);
-      $(`#pizza-${activePizza.id}`).click(function(){
-        var pizza = getPizzaByID(parseInt($(this).attr("name")));
+      $(`#pizza-${activePizza.id} button`).click(function(){
+        var pizza = getPizzaByID(parseInt($(this).parent().attr("name")));
         setActivePizza(pizza);
       });
-      setActivePizza(new Pizza(Pizza.prototype.sizes.m));
     }
+    setActivePizza(new Pizza(Pizza.prototype.sizes.m));
   });
 
   writeToppings();
